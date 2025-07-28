@@ -123,9 +123,11 @@ func (r *ChinaResolver) setServerList(servers []string) {
 }
 
 func (r *ChinaResolver) applyConfig(config *Config) {
-	r.setServerList(config.ServerList)
-	r.network = config.Network
-	r.timeout = config.Timeout
+	if config != nil {
+		r.setServerList(config.ServerList)
+		r.network = config.Network
+		r.timeout = config.Timeout
+	}
 }
 
 func (r *ChinaResolver) buildDNSQueryWithOPT(typ dnsmessage.Type, name string) ([]byte, error) {
@@ -262,6 +264,7 @@ func (r *ChinaResolver) lookupIP(typ dnsmessage.Type, name string) ([]string, er
 		return nil, err
 	}
 	var results []string
+	var found bool
 	for _, server := range r.serverList {
 		conn, err := net.Dial("udp", server)
 		conn.SetDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
@@ -286,11 +289,12 @@ func (r *ChinaResolver) lookupIP(typ dnsmessage.Type, name string) ([]string, er
 			result, ok := r.filterResult(resp)
 			if ok {
 				results = result
+				found = true
 				break
 			}
 		}
 		// Exit when you get correct IP
-		if results != nil {
+		if found {
 			break
 		}
 	}
