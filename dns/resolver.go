@@ -107,7 +107,7 @@ func (r *ChinaResolver) setServerList(servers []string) {
 		if err != nil {
 			// The server without port should OK
 			// Try add :domain, parse again
-			serverWithDomain := net.JoinHostPort(host, "domain")
+			serverWithDomain := net.JoinHostPort(server, "domain")
 			host, port, err = net.SplitHostPort(serverWithDomain)
 		}
 		if err != nil {
